@@ -1,6 +1,31 @@
+import tkinter as tk
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import contextily as ctx
+import pyproj
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+
+def test_topomap():
+    lat = 47.136040305555554
+    lon = 13.119993583333335
+
+    gdf = gpd.read_file('tests/NUTS_RG_01M_2021_4326.json')
+    print([col for col in gdf.columns])
+    gdf.crs = 'EPSG:4326'
+    gdf = gdf.to_crs('EPSG:4326')
+    
+    fig, ax = plt.subplots()
+
+    gdf.plot(ax=ax, kind='geo', alpha=0.5)
+
+    ax.set_xlim(lon-3, lon+3)
+    ax.set_ylim(lat-3, lat+3)
+
+    ax.scatter([lon], [lat], color='crimson')
+
+    fig.savefig('tests/GeoPandasTopo.pdf')
+    return None
 
 
 def test():
@@ -33,6 +58,35 @@ def test():
     return None
 
 
+def test_ctx(zoom=13):
+    root = tk.Tk()
+
+    plt.rcParams['figure.dpi'] = 100
+    print('Loading Map..')
+    place = ctx.Place("Bad Gastein", source=ctx.providers.OpenTopoMap, zoom=zoom)
+    print('..Loaded Map!')
+
+    fig, ax = plt.subplots(figsize=(20,20))
+    ax.axis('off')
+
+    chart_type = FigureCanvasTkAgg(fig, root)
+    chart_type.get_tk_widget().pack(side='top', fill=tk.BOTH)
+
+    place.plot(ax)
+    lon = 13.119993583333335
+    lat = 47.136040305555554
+    transformer = pyproj.Transformer.from_crs('epsg:4326', 'epsg:3857')
+    lat_w, lon_w = transformer.transform(lat, lon)
+
+    ax.scatter([lat_w], [lon_w], color='crimson')
+
+    fig.savefig('tests/TestPlace.pdf')
+    print('saved tests/TestPlace.pdf')
+
+    root.mainloop()
+    return None
+
+
 def test_wholeworld():
     lat = 47.136040305555554
     lon = 13.119993583333335
@@ -56,4 +110,6 @@ def test_wholeworld():
 
 
 if __name__=='__main__':
-    test()
+    # test()
+    test_ctx()
+    # test_topomap()

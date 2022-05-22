@@ -58,7 +58,7 @@ if __name__=='__main__':
     # image_name1 = 'tests/TestPic2.JPG'
     image_name2 = 'tests/DJI_0015.JPG'
 
-    info = test(image_name1)
-    print_gps(info)
+    #info = test(image_name1)
+    #print_gps(info)
     info = test(image_name2)
     print_gps(info)
